@@ -75,10 +75,10 @@ public class PatientRepositoryImpl implements PatientRepositoryCustom {
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<PatientVisitDto> findPatients(int page, int size, String search, List<Integer> doctorsId) {
+    public List<PatientVisitDto> findPatients(int page, int size, String search, List<Integer> doctorIds) {
         String trimmedSearch = (search != null) ? search.trim() : null;
         boolean hasSearch = trimmedSearch != null && !trimmedSearch.isEmpty();
-        boolean hasDoctorIds = doctorsId != null && !doctorsId.isEmpty();
+        boolean hasDoctorIds = doctorIds != null && !doctorIds.isEmpty();
 
         String patientWhere = hasSearch ? "WHERE LOWER(p.first_name) LIKE LOWER(:search)" : "";
         String visitWhere = hasDoctorIds ? "WHERE v.doctor_id IN (:doctorIds)" : "";
@@ -92,7 +92,7 @@ public class PatientRepositoryImpl implements PatientRepositoryCustom {
             query.setParameter("search", "%" + trimmedSearch + "%");
         }
         if (hasDoctorIds) {
-            query.setParameter("doctorIds", doctorsId);
+            query.setParameter("doctorIds", doctorIds);
         }
 
         List<Tuple> results = query.getResultList();
