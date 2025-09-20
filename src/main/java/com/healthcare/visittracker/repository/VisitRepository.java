@@ -9,13 +9,12 @@ import java.time.Instant;
 public interface VisitRepository extends JpaRepository<Visit, Integer> {
 
     @Query("""
-                SELECT EXISTS (
-                    SELECT 1 FROM Visit v
-                    WHERE (v.doctor.id = :doctorId OR v.patient.id = :patientId)
-                      AND v.startDateTime < :end
-                      AND v.endDateTime > :start
-                )
-            """)
+            SELECT EXISTS (
+              SELECT 1 FROM Visit v
+              WHERE (v.doctor.id = :doctorId OR v.patient.id = :patientId)
+                AND v.startDateTime < :end
+                AND v.endDateTime > :start
+            )""")
     boolean hasVisitConflict(Integer doctorId, Integer patientId, Instant start, Instant end);
 
 }
