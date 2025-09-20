@@ -41,8 +41,8 @@ public class VisitService {
 
         Instant startInstant = request.getStart().atZone(doctorZone).toInstant();
         Instant endInstant = request.getEnd().atZone(doctorZone).toInstant();
-        if (visitRepository.hasOverlappingVisit(doctor.getId(), startInstant, endInstant)) {
-            throw new VisitConflictException("Doctor already has a visit in the given time range");
+        if (visitRepository.hasVisitConflict(doctor.getId(), patient.getId(), startInstant, endInstant)) {
+            throw new VisitConflictException("Doctor or patient already has a visit at this time");
         }
 
         Visit visit = Visit.builder()

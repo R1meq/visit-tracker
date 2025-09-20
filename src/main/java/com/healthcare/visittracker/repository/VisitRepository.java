@@ -9,12 +9,13 @@ import java.time.Instant;
 public interface VisitRepository extends JpaRepository<Visit, Integer> {
 
     @Query("""
-                SELECT CASE WHEN COUNT(v) > 0 THEN true ELSE false END
-                FROM Visit v
-                WHERE v.doctor.id = :doctorId
-                  AND v.startDateTime < :end
-                  AND v.endDateTime > :start
+                SELECT EXISTS (
+                    SELECT 1 FROM Visit v
+                    WHERE (v.doctor.id = :doctorId OR v.patient.id = :patientId)
+                      AND v.startDateTime < :end
+                      AND v.endDateTime > :start
+                )
             """)
-    boolean hasOverlappingVisit(Integer doctorId, Instant start, Instant end);
+    boolean hasVisitConflict(Integer doctorId, Integer patientId, Instant start, Instant end);
 
 }
