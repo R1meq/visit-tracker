@@ -25,7 +25,6 @@ public class PatientVisitDto {
     private Long doctorTotalPatients;
     private String doctorFirstName;
     private String doctorLastName;
-    private Integer doctorId;
 
     public boolean hasVisit() {
         return visitStart != null;
@@ -37,9 +36,9 @@ public class PatientVisitDto {
                 .patientId((Integer) tuple.get("patient_id"))
                 .patientFirstName((String) tuple.get("patient_first_name"))
                 .patientLastName((String) tuple.get("patient_last_name"))
-                .doctorId((Integer) tuple.get("doctor_id"))
                 .doctorFirstName((String) tuple.get("doctor_first_name"))
                 .doctorLastName((String) tuple.get("doctor_last_name"))
+                .doctorTotalPatients((Long) tuple.get("doctor_total_patients"))
                 .visitStart(convertToDoctorZone((Timestamp) tuple.get("latest_visit_start"), doctorTimezone))
                 .visitEnd(convertToDoctorZone((Timestamp) tuple.get("latest_visit_end"), doctorTimezone))
                 .build();

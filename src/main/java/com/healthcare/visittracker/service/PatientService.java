@@ -1,5 +1,6 @@
 package com.healthcare.visittracker.service;
 
+import com.healthcare.visittracker.dto.PatientPageResult;
 import com.healthcare.visittracker.dto.PatientVisitDto;
 import com.healthcare.visittracker.dto.PatientListDto;
 import com.healthcare.visittracker.repository.PatientRepository;
@@ -13,8 +14,6 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,12 +22,12 @@ public class PatientService {
     private final PatientRepository patientRepository;
 
     public PatientListDto findPatients(int page, int size, String search, List<Integer> doctorIds) {
-        List<PatientVisitDto> rawData = patientRepository.findPatients(page, size, search, doctorIds);
-        long totalPatientCount = patientRepository.countPatients(search);
+        PatientPageResult result = patientRepository.findPatients(page, size, search, doctorIds);
+        List<PatientVisitDto> rawData = result.getPatients();
+        final long totalPatientCount = result.getTotalCount();
         if (rawData.isEmpty()) {
             return new PatientListDto(Collections.emptyList(), totalPatientCount);
         }
-        addDoctorTotalPatients(rawData);
 
         Map<PatientKey, List<PatientListDto.Visit>> groupedPatients = rawData.stream()
                 .collect(Collectors.groupingBy(
@@ -46,20 +45,6 @@ public class PatientService {
                 .toList();
 
         return new PatientListDto(patients, totalPatientCount);
-    }
-
-    private void addDoctorTotalPatients(List<PatientVisitDto> rawData) {
-        Set<Integer> uniqueDoctorIds = rawData.stream()
-                .map(PatientVisitDto::getDoctorId)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
-        if (uniqueDoctorIds.isEmpty()) {
-            return;
-        }
-        Map<Integer, Long> doctorCounts = patientRepository.getDoctorPatientCounts(uniqueDoctorIds);
-        rawData.stream()
-                .filter(p -> p.getDoctorId() != null)
-                .forEach(p -> p.setDoctorTotalPatients(doctorCounts.getOrDefault(p.getDoctorId(), 0L)));
     }
 
     @Data
